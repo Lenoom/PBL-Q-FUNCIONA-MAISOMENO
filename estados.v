@@ -1,61 +1,45 @@
-module estados(botao,sinal,sinal15,Us,Ua,T,Q,casoEsp);
-	input sinal,sinal15,botao,Us,Ua,T;
-	output [1:0]Q;
+module estados(botao,sinal,sinalquinze,Us,Ua,T,estado,casoEsp);
+	input sinal,sinalquinze,botao,Us,Ua,T;
+	output [1:0]estado;
 	output casoEsp;
-	wire [1:0]preset,resetin,reset,reset1,reset2,D;
-	wire casoEsp,encher,goteja,asperge,asperge_esp,goteja_esp;
-	wire [5:0] estado0,estado1;
-	wire [2:0] aux;
-	// Preseta os resets;
-	or(resetin[0],Q[1],!Q[1]);
-	or(resetin[1],Q[1],!Q[1]);
+	wire [1:0]estado,D,preset,reset;
+	wire [10:0]aux;
+	wire troca;
 	
-	and(reset1[0],resetin[0],botao);
-	and(reset1[1],resetin[1],botao);
+	and(sinal15,sinalquinze,casoEsp,!estado[1],estado[0]);
+	or(troca,botao,sinal,sinal15,Us);
+	
 	
 	// Define o Caso Específico
 	and(casoEsp,Ua,!T);
 	
-	//	Enchendo
-	and(encher,Q[0],Q[1],sinal);
-	and(reset2[0],encher,sinal);
-	and(reset2[1],encher,sinal);
+	// Aspersão
+	or(cu,!T,!Ua);
+	and(aspersao,!estado[0],!estado[1],sinal,cu);
+	
+	// Gotejamento
+	and(gotejamento1,!estado[1],!estado[0],!casoEsp,sinal,Ua,T);
+	and(gotejamento2,!estado[1],estado[0],casoEsp,sinal15);
+	or(gotejamento,gotejamento1,gotejamento2);
 	
 	// Limpeza
-	xor(aux[0],Q[1],Q[0]);
-	and(limpar,aux[0],sinal);
-	and(estado0[0],limpar,sinal);
-	and(estado1[0],limpar,sinal);
+	and(aux[2],estado[1],!estado[0],sinal);
+	and(aux[3],!estado[1],estado[0],sinal,!casoEsp);
+	or(limpeza,aux[2],aux[3]);
 	
-	//Gotejamento
-	and(goteja,!Q[1],!Q[0],sinal,Ua,!Us,T,!casoEsp);
-	and(estado1[1],goteja,sinal);
+	// Enchimento
+	and(enchimento,estado[1],estado[0],sinal);
 	
-	//Aspersão
-	or(aux[1],!T,!Ua);
-	and(asperge,aux[1],!Us,!Q[1],!Q[0],!casoEsp,sinal);
-	and(estado0[1],asperge,sinal);
+	// Define entrada dos flip flops
+	or(aux[4],aspersao,limpeza);
+	and(D[0],aux[4],!gotejamento,!enchimento,!botao,!Us);
 	
-	// Caso Específico
-	// Aspersão aq
-	and(asperge_esp,!Q[1],!Q[0],!Us,casoEsp,sinal);
-	and(estado0[2],asperge_esp,sinal);
-	// Gotejamento aq
-	and(goteja_esp,Q[0],!Q[1],!Us,casoEsp,sinal15);
 	
-	// O sinal que os FlipFlops recebe.
-	and(aux[2],casoEsp,sinal15);
-	or(troca,aux[2],sinal);
+	or(aux[5],sinal15,limpeza,gotejamento);
+	and(D[1],aux[5],!aspersao,!enchimento,!botao,!Us);
 	
-	// Aq manda os sinais D0 e D1 pra memória do FlipFlop;
-	or(D[0],estado0[0],estado0[1],estado0[2]);
-	or(D[1],estado1[0],estado1[1]);
+	FlipFlopD(preset[0],reset[0],D[0],troca,estado[0]);
 	
-	or(reset[0],reset1[0],reset2[0]);
-	or(reset[1],reset2[0],reset2[1]);
-	
-	FlipFlopD(preset[0],reset[0],D[0],troca,Q[0]);
-	
-	FlipFlopD(preset[1],reset[1],D[1],troca,Q[1]);
+	FlipFlopD(preset[1],reset[1],D[1],troca,estado[1]);
 	
 endmodule
