@@ -1,0 +1,22 @@
+module digitolimpeza(clock,botao,segmentos);
+	input clock,botao;
+	output [6:0]segmentos; // a = 0 g = 6
+	wire [2:0]Q;
+	
+	contadorseis(clock,botao,Q);
+	
+	// A
+	and(segmentos[0],Q[0],!Q[1],Q[2]);
+	// B
+	and(segmentos[0],!Q[0],!Q[1],!Q[2]);
+	// C
+	and(segmentos[0],Q[0],!Q[1],!Q[2]);
+	// D
+	and(segmentos[0],!Q[0],Q[1],!Q[2]);
+	// E
+	and(segmentos[0],Q[0],Q[1],!Q[2]);
+	// F
+	and(segmentos[0],!Q[0],!Q[1],Q[2]);
+	// G
+	or(segmentos[0],Q[1],!Q[1]);
+endmodule

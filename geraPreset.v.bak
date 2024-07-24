@@ -1,0 +1,4 @@
+module geraPreset(Us,Ua,T,preset);
+	input Us,Ua,T;
+	output [3:0]preset;
+endmodule

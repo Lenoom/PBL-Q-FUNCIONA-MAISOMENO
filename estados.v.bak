@@ -1,0 +1,18 @@
+module estados(clock,botao,sinal,sinal15,Us,Ua,T,,Q);
+	input clock,sinal;
+	output [1:0]Q,D;
+	wire [1:0]preset,reset;
+	wire casoEsp;
+	// Preseta os resets;
+	or(reset[0],Q[1],!Q[1]);
+	or(reset[1],Q[1],!Q[1]);
+	
+	// Define o Caso Específico
+	and(casoEsp,Ua,!T);
+	
+	
+	FlipFlopD(preset[0],reset[0],D[0],clock,Q[0]);
+	
+	FlipFlopD(preset[1],reset[1],D[1],clock,Q[1]);
+	
+endmodule

@@ -1,0 +1,26 @@
+module digitoestado(estado,sinal,clock,segmentos);
+	input sinal,clock;
+	input [1:0]estado;
+	output [6:0]segmentos; // a = 0 g = 6
+	wire [2:0]Q;
+	wire [6:0]segments;
+	
+	// A
+	and(segmentos[0],Q[1],!Q[1]);
+	// B
+	not(segmentos[1],Q[0]);
+	// C
+	and(segmentos[2],!Q[0],!Q[1]);
+	// D
+	and(segmentos[3],Q[0],!Q[1]);
+	// E
+	and(segmentos[4],Q[0],!Q[0]);
+	// F
+	and(segmentos[5],Q[0],!Q[0]);
+	// G
+	and(segmentos[6],!Q[0],Q[1]);
+	
+	// No caso específico
+	
+	digitolimpeza(clock,sinal,segments);
+	and(segmentos,Q[1],Q[0],segments);

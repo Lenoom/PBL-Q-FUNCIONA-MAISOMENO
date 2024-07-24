@@ -1,0 +1,5 @@
+module main(Us,Ua,T,button,segmentos,digito);
+	input Us,Ua,T,button;
+	output [3:0]digito;
+	output [6:0]segmentos;
+endmodule
